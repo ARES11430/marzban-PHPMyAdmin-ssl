@@ -1,16 +1,34 @@
 #!/bin/bash
 
+# Function to install Nginx if not installed
+install_nginx() {
+    echo "Nginx is not installed. Installing Nginx..."
+    sudo apt update
+    sudo apt install nginx -y
+    echo "Nginx has been installed."
+}
+
+# Check if Nginx is installed
+if ! command -v nginx &> /dev/null; then
+    install_nginx
+fi
+
 # Ask the user for input
 read -p "Enter your domain (e.g., panel.example.com): " domain
 read -p "Enter the full path to the PEM certificate file (e.g., /etc/certs/certificate.pem): " pem_file
 read -p "Enter the full path to the Key certificate file (e.g., /etc/certs/private.key): " key_file
-read -p "Enter the phpMyAdmin port (e.g., 8010): " pma_port
-read -p "Enter the desired HTTPS port (e.g., 8443): " https_port
+
+# Set default ports if not provided
+read -p "Enter the phpMyAdmin port (default is 8010): " pma_port
+pma_port=${pma_port:-8010}
+
+read -p "Enter the desired HTTPS port (default is 8443): " https_port
+https_port=${https_port:-8443}
 
 # Check if the nginx directory exists
 nginx_dir="/etc/nginx/sites-available"
 if [ ! -d "$nginx_dir" ]; then
-    echo "Nginx is not installed or the configuration directory is missing."
+    echo "Nginx configuration directory is missing."
     exit 1
 fi
 
